@@ -13,16 +13,19 @@ specifically, I want to achieve:
 
 class Scalar:
 
-    def __init__(self, value):
+    def __init__(self, value, label = ''):
         self.value = value
         self.grad  = 0.0
 
         self.prev_list = []
         self._backward = lambda: None    # Returns None from a parameter-less function by default
 
+        self._op = ''
+        self.label = label
+
 
     def __repr__(self):
-        return f"Scalar(Value:{self.value}, Grad:{self.grad})"
+        return f"Scalar(Value:{self.value}, Grad:{self.grad}), Label:{self.label}"
 
 
     def __add__(self, input):
@@ -31,6 +34,8 @@ class Scalar:
 
         res = Scalar(res)
         res.prev_list = (self, input)
+        res._op = '+'
+        res.label = f'({self.label} + {input.label})'
 
         def _backward():
             ''' 
@@ -52,6 +57,8 @@ class Scalar:
 
         res = Scalar(res)
         res.prev_list = (self, input)
+        res._op = '*'
+        res.label = f'({self.label} * {input.label})'
 
         def _backward():
             ''' 
@@ -70,31 +77,42 @@ class Scalar:
         return res
 
 
-    def backward(self):
-        graph_as_list = []
-        visited_list = set()
+    def build_graph(self):
+        # Set up global variables accessible through the following closure functions...
+        node_list = []
+        edge_list = []
 
-        def build_graph(node):
-            # Have we been this node before???
-            if not node in visited_list:
-                # Note down that we have visited this node...
-                visited_list.add(node)
-
+        # Define the closure...
+        def trace(node_current):
+            ''' The function is writte in a closure style so that all recursive
+                instances can access to the same global variable (node_list and
+                edge_list).
+            '''
+            # Are we at the end node???
+            if not node_current in node_list:
                 # Going down the tree until no more node is found before saving this node...
                 # Implicit conditional branches in this recursion:
-                # - Loop done scenario 1 (end)         : no more prev nodes exist;
-                # - Loop done Scenario 2 (intermediate): no more prev nodes unvisited;
-                for prev_node in node.prev_list:
-                    build_graph(prev_node)
+                # - End scenario 1 (end)         : no more prev nodes exist;
+                # - End scenario 2 (intermediate): no more prev nodes unvisited;
+                for node_prev in node_current.prev_list:
+                    trace(node_prev)
+                    edge_list.append((node_prev, node_current))
 
                 # Save end/intermediate node...
-                graph_as_list.append(node)
+                node_list.append(node_current)
 
-        build_graph(self)
+        # Trace down the graph from self...
+        trace(self)
+
+        return node_list, edge_list
+
+
+    def backward(self):
+        node_list, edge_list = self.build_graph()
 
         # Go back to the result node and calculate gradients...
         self.grad = 1.0
-        for node in reversed(graph_as_list):
+        for node in reversed(node_list):
             # Calculate gradients or do nothing if no prev node exists...
             node._backward()
 
