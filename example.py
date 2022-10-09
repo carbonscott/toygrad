@@ -7,24 +7,9 @@ import torch
 
 from graphviz import Digraph
 
-def trace(root):
-  # builds a set of all nodes and edges in a graph
-  nodes, edges = list(), list()
-  def build(v):
-    if v not in nodes:
-      ## nodes.add(v)
-      nodes.append(v)
-      for child in v.prev_list:
-        ## edges.add((child, v))
-        edges.append((child, v))
-        build(child)
-  build(root)
-  return nodes, edges
-
 def draw_dot(root):
   dot = Digraph(format='pdf', graph_attr={'rankdir': 'LR'}, filename = 'test.gv') # LR = left to right
 
-  ## nodes, edges = trace(root)
   nodes, edges = root.build_graph()
   for n in nodes:
     uid = str(id(n))
@@ -42,10 +27,23 @@ def draw_dot(root):
 
   return dot
 
-a1 = Scalar(4.0, 'a1')
+a1 = Scalar(4.0 , 'a1')
 a2 = Scalar(-3.0, 'a2')
-a3 = Scalar(2.0, 'a3')
+a3 = Scalar(2.0 , 'a3')
 
-res = a1 * a2 + a2 * a3
-res.backward()
-draw_dot(res).render()
+res_a = a1 * a2 + a2 * a3 + a3
+res_a.backward()
+draw_dot(res_a).render()
+
+
+b1 = torch.tensor(4.0 , requires_grad = True)
+b2 = torch.tensor(-3.0, requires_grad = True)
+b3 = torch.tensor(2.0 , requires_grad = True)
+
+res_b = b1 * b2 + b2 * b3 + b3
+res_b.backward()
+
+
+assert a1.grad == b1.grad, "Test failed!"
+assert a2.grad == b2.grad, "Test failed!"
+assert a3.grad == b3.grad, "Test failed!"
