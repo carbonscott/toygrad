@@ -1,13 +1,20 @@
 '''
 
 The goal of the toy grad engine is to practice the concepts that I learned
-from (`micrograd`)[https:
-//github.com/karpathy/micrograd/blob/master/micrograd/engine.py].  More
-specifically, I want to achieve:
+from (`micrograd`)[https://github.com/karpathy/micrograd/blob/master/micrograd/engine.py].  
+More specifically, I want to achieve:
 
-- Write a Scalar class that tracks value, grad and prev nodes that lead to the current node (self).
+- Write a Scalar class that tracks value, grad and prev nodes that lead to the
+  current node (self).
 - Provide backprop both in the partial gradient level and global level.
 - Try to pass unit tests that use PyTorch as the engine.
+
+Some extra points to understand:
+
+- Multiply a value less than one (like 1e-3) can cause the gradient to be very
+  small.
+- Adding a value that has been used before in some multiplication can make its
+  graident increased by one.
 
 '''
 
