@@ -88,18 +88,16 @@ class Scalar:
                 instances can access to the same global variable (node_list and
                 edge_list).
             '''
-            # Are we at the end node???
-            if not node_current in node_list:
-                # Going down the tree until no more node is found before saving this node...
-                # Implicit conditional branches in this recursion:
-                # - End scenario 1 (end)         : no more prev nodes exist;
-                # - End scenario 2 (intermediate): no more prev nodes unvisited;
-                for node_prev in node_current.prev_list:
-                    trace(node_prev)
-                    edge_list.append((node_prev, node_current))
+            # Going down the tree until no more node is found before saving this node...
+            # Implicit conditional branches in this recursion:
+            # - End scenario 1 (end)         : no more prev nodes exist;
+            # - End scenario 2 (intermediate): no more prev nodes unvisited;
+            for node_prev in node_current.prev_list:
+                trace(node_prev)
+                edge_list.append((node_prev, node_current))
 
-                # Save end/intermediate node...
-                node_list.append(node_current)
+            # Save end/intermediate node...
+            node_list.append(node_current)
 
         # Trace down the graph from self...
         trace(self)
