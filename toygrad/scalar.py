@@ -96,7 +96,7 @@ class Scalar:
         edge_list = []
 
         # Define the closure...
-        def trace(node_current):
+        def trace(node_result):
             ''' The function is writte in a closure style so that all recursive
                 instances can access to the same global variable (node_list and
                 edge_list).
@@ -105,12 +105,12 @@ class Scalar:
             # Implicit conditional branches in this recursion:
             # - End scenario 1 (end)         : no more prev nodes exist;
             # - End scenario 2 (intermediate): no more prev nodes unvisited;
-            for node_prev in node_current.operand_list:
-                trace(node_prev)
-                edge_list.append((node_prev, node_current))
+            for node_operand in node_result.operand_list:
+                trace(node_operand)
+                edge_list.append((node_operand, node_result))
 
             # Save end/intermediate node...
-            node_list.append(node_current)
+            node_list.append(node_result)
 
         # Trace down the graph from self...
         trace(self)
