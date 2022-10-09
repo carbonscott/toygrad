@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from toygrad.engine import Scalar
+from toygrad.scalar import Scalar
 
 import torch
 
