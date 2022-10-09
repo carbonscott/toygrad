@@ -12,15 +12,26 @@ specifically, I want to achieve:
 '''
 
 class Scalar:
+    '''
+    Property of accumulative gradient of an operand:
+        Gradient of the responding result from an operator with respect to each
+        operand is accumulative.  
+
+    Example:
+        res = a1 * a2 + a2
+
+        d(res)/d(a2) = p(res)/p(a1 * a2) * p(a1 * a2)/p(a2) +
+                       p(res)/p(a2)
+    '''
 
     def __init__(self, value, label = ''):
         self.value = value
         self.grad  = 0.0
 
-        self.prev_list = []
-        self._backward = lambda: None    # Returns None from a parameter-less function by default
+        self.operand_list = []
+        self.operator     = ''
+        self._backward    = lambda: None    # Returns None from a parameter-less function by default
 
-        self._op = ''
         self.label = label
 
 
@@ -32,9 +43,10 @@ class Scalar:
         input = input if isinstance(input, Scalar) else Scalar(input)
         res = self.value + input.value
 
+        # Track the result, its operands, operator and the label...
         res = Scalar(res)
-        res.prev_list = (self, input)
-        res._op = '+'
+        res.operand_list = (self, input)
+        res.operator = '+'
         res.label = f'({self.label} + {input.label})'
 
         def _backward():
@@ -53,8 +65,8 @@ class Scalar:
         res = self.value * input.value
 
         res = Scalar(res)
-        res.prev_list = (self, input)
-        res._op = '*'
+        res.operand_list = (self, input)
+        res.operator = '*'
         res.label = f'({self.label} * {input.label})'
 
         def _backward():
@@ -86,7 +98,7 @@ class Scalar:
             # Implicit conditional branches in this recursion:
             # - End scenario 1 (end)         : no more prev nodes exist;
             # - End scenario 2 (intermediate): no more prev nodes unvisited;
-            for node_prev in node_current.prev_list:
+            for node_prev in node_current.operand_list:
                 trace(node_prev)
                 edge_list.append((node_prev, node_current))
 
