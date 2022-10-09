@@ -87,7 +87,7 @@ class Scalar:
                 for prev_node in node.prev_list:
                     build_graph(prev_node)
 
-                # Save node...
+                # Save end/intermediate node...
                 graph_as_list.append(node)
 
         build_graph(self)
