@@ -103,13 +103,13 @@ class Scalar:
             '''
             # Going down the tree until no more node is found before saving this node...
             # Implicit conditional branches in this recursion:
-            # - End scenario 1 (end)         : no more operand nodes exist;
-            # - End scenario 2 (intermediate): no more operand nodes unvisited;
+            # - Scenario 1: no more operand nodes exist, skip the loop;
+            # - Scenario 2: no more operand nodes unvisited, go into the loop and finishing tracing;
             for node_operand in node_result.operand_list:
                 # Trace any operand node...
                 trace(node_operand)
 
-                # Save edges after finishing tracing operand nodes...
+                # Save edges after finishing tracing the operand node...
                 edge_list.append((node_operand, node_result))
 
             # Save end/intermediate node...
