@@ -4,7 +4,7 @@ The goal of the toy grad engine is to practice the concepts that I learned
 from (`micrograd`)[https://github.com/karpathy/micrograd/blob/master/micrograd/engine.py].  
 More specifically, I want to achieve:
 
-- Write a Scalar class that tracks value, grad and prev nodes that lead to the
+- Write a Scalar class that tracks value, grad and operand nodes that lead to the
   current node (self).
 - Provide backprop both in the partial gradient level and global level.
 - Try to pass unit tests that use PyTorch as the engine.
@@ -97,14 +97,14 @@ class Scalar:
 
         # Define the closure...
         def trace(node_result):
-            ''' The function is writte in a closure style so that all recursive
-                instances can access to the same global variable (node_list and
-                edge_list).
+            ''' The function is written in a closure style so that all
+                recursive instances can access the same global variable
+                (node_list and edge_list).
             '''
             # Going down the tree until no more node is found before saving this node...
             # Implicit conditional branches in this recursion:
-            # - End scenario 1 (end)         : no more prev nodes exist;
-            # - End scenario 2 (intermediate): no more prev nodes unvisited;
+            # - End scenario 1 (end)         : no more operand nodes exist;
+            # - End scenario 2 (intermediate): no more operand nodes unvisited;
             for node_operand in node_result.operand_list:
                 trace(node_operand)
                 edge_list.append((node_operand, node_result))
@@ -124,7 +124,7 @@ class Scalar:
         # Go back to the result node and calculate gradients...
         self.grad = 1.0
         for node in reversed(node_list):
-            # Calculate gradients or do nothing if no prev node exists...
+            # Calculate gradients or do nothing when no operand node exists...
             node._backward()
 
 
