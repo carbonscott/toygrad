@@ -38,10 +38,7 @@ class Scalar:
         res.label = f'({self.label} + {input.label})'
 
         def _backward():
-            ''' 
-            Backprop for addition:
-                Track each pathway.
-            '''
+            # Accumulate gradients for each operand...
             self.grad  += res.grad
             input.grad += res.grad
 
@@ -61,15 +58,12 @@ class Scalar:
         res.label = f'({self.label} * {input.label})'
 
         def _backward():
-            ''' 
-            Backprop for multiplication:
-                Basically just pass along the gradient from resulting node.
-            '''
-            par_grad = input.value
-            self.grad  += res.grad * par_grad
+            # Accumulate gradients for each operand scaled by the value of the other operand...
+            grad_partial = input.value
+            self.grad   += res.grad * grad_partial
 
-            par_grad = self.value
-            input.grad += res.grad * par_grad
+            grad_partial = self.value
+            input.grad  += res.grad * grad_partial
 
         # The resulting node should have a definite backward function...
         res._backward = _backward
