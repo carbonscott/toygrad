@@ -82,8 +82,8 @@ class Scalar:
 
                 # Going down the tree until no more node is found before saving this node...
                 # Implicit conditional branches in this recursion:
-                # - Loop done scenario 1 (end)         : this node doesn't have prev nodes;
-                # - Loop done Scenario 2 (intermediate): all prev nodes of this node have been visited;
+                # - Loop done scenario 1 (end)         : no more prev nodes exist;
+                # - Loop done Scenario 2 (intermediate): no more prev nodes unvisited;
                 for prev_node in node.prev_list:
                     build_graph(prev_node)
 
