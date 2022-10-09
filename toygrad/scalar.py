@@ -70,7 +70,7 @@ class Scalar:
         res.label = f'({self.label} * {input.label})'
 
         def _backward():
-            # Accumulate gradients for each operand scaled by the partial gradient of the other operand...
+            # Accumulate gradients for each operand scaled by the value of the other operand (=value of partial gradient)...
             grad_partial = input.value
             self.grad   += res.grad * grad_partial
 
