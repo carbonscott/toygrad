@@ -18,7 +18,7 @@ class Scalar:
         self.grad  = 0.0
 
         self.prev_list = []
-        self._backward = lambda: None    # Empty function that returns None
+        self._backward = lambda: None    # Returns None from a parameter-less function by default
 
 
     def __repr__(self):
@@ -95,9 +95,8 @@ class Scalar:
         # Go back to the result node and calculate gradients...
         self.grad = 1.0
         for node in reversed(graph_as_list):
-            # Is it an end node???
-            if len(node.prev_list):
-                node._backward()
+            # Calculate gradients or do nothing if no prev node exists...
+            node._backward()
 
 
     def __radd__(self, input):
